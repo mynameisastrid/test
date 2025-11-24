@@ -19,8 +19,12 @@
                             card: '#1f2937',
                             text: '#f3f4f6',
                             muted: '#9ca3af'
-                        }
-                    }
+                        },
+                        red: { 50: '#fef2f2', 100: '#fee2e2', 600: '#dc2626', 700: '#b91c1c' },
+                        green: { 50: '#f0fdf4', 100: '#dcfce7', 600: '#16a34a', 700: '#15803d' },
+                        gray: { 100: '#f3f4f6', 200: '#e5e7eb', 500: '#6b7280', 700: '#374151', 900: '#111827' }
+                    },
+                    borderRadius: { '2xl': '1rem' }
                 }
             }
         }
@@ -34,17 +38,8 @@
         .category-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         .dark .category-list::-webkit-scrollbar-thumb { background: #4b5563; }
         .category-list::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        /* Tabs Styles */
-        .tab-active {
-            border-bottom: 3px solid #2563eb;
-            color: #2563eb;
-            font-weight: 600;
-        }
-        .dark .tab-active {
-            border-bottom-color: #60a5fa;
-            color: #60a5fa;
-        }
+        .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
+        .dark .tab-active { border-bottom-color: #60a5fa; color: #60a5fa; }
     </style>
 </head>
 <body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 flex flex-col min-h-screen">
@@ -212,9 +207,11 @@
                             </div>
                             <div>
                                 <label for="transaction-category" class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Categoria</label>
-                                <select id="transaction-category" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors">
+                                <!-- ALTERADO: Input com datalist para digitação livre -->
+                                <input type="text" id="transaction-category" list="category-list" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white transition-colors" placeholder="Selecione ou digite..." required>
+                                <datalist id="category-list">
                                     <!-- Categorias preenchidas via JS -->
-                                </select>
+                                </datalist>
                             </div>
                         </div>
                         <div>
@@ -285,9 +282,9 @@
 
         <!-- ==================== VIEW: INVESTIMENTOS (NOVA TAB) ==================== -->
         <div id="view-investments" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <!-- COLUNA ESQUERDA: Resumo Carteira -->
+            <!-- (Conteúdo de Investimentos Mantido Igual) -->
             <div class="lg:col-span-1 space-y-6">
+                <!-- Resumo da Carteira -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-emerald-500 transition-colors">
                     <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white">
                         <i data-feather="briefcase" class="mr-2 h-5 w-5"></i> Resumo da Carteira
@@ -309,9 +306,18 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- NOVO: Rendimento por Instituição -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border-l-4 border-cyan-500 transition-colors">
+                    <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white">
+                        <i data-feather="briefcase" class="mr-2 h-5 w-5"></i> Rendimento por Instituição
+                    </h2>
+                    <div id="institution-breakdown" class="text-gray-700 dark:text-gray-300 category-list max-h-64 overflow-y-auto pr-2 space-y-2">
+                        <p class="italic text-gray-400">Nenhum dado registrado ainda</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- COLUNA DIREITA: Formulário e Lista -->
             <div class="lg:col-span-2 space-y-6">
                 
                 <!-- Formulário de Investimento -->
@@ -326,29 +332,32 @@
                                 <input type="text" id="inv-name" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Ex: CDB 120% CDI">
                             </div>
                             <div>
-                                <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Data do Aporte</label>
-                                <input type="date" id="inv-date" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                                <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Instituição</label>
+                                <input type="text" id="inv-institution" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Ex: Nubank, XP, Inter">
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
+                                <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Data do Aporte</label>
+                                <input type="date" id="inv-date" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+                            </div>
+                            <div>
                                 <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Valor Inicial (R$)</label>
                                 <input type="text" id="inv-initial" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="0,00" oninput="formatCurrencyMask(this)">
                             </div>
-                            <!-- MODIFICADO: Campo Duração em vez de Aporte Mensal -->
                             <div>
                                 <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Duração (Anos)</label>
                                 <input type="number" id="inv-duration" required min="1" step="0.5" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Ex: 2">
                             </div>
-                            <div>
-                                <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Taxa de Rendimento (%)</label>
-                                <div class="flex">
-                                    <input type="number" id="inv-rate" required step="0.01" class="w-2/3 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Ex: 10.5">
-                                    <select id="inv-rate-type" class="w-1/3 px-2 py-2 border border-l-0 rounded-r-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-600 dark:text-white text-sm focus:outline-none">
-                                        <option value="annual">Anual</option>
-                                        <option value="monthly">Mensal</option>
-                                    </select>
-                                </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Taxa de Rendimento (%)</label>
+                            <div class="flex">
+                                <input type="number" id="inv-rate" required step="0.01" class="w-2/3 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Ex: 10.5">
+                                <select id="inv-rate-type" class="w-1/3 px-2 py-2 border border-l-0 rounded-r-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-600 dark:text-white text-sm focus:outline-none">
+                                    <option value="annual">Anual</option>
+                                    <option value="monthly">Mensal</option>
+                                </select>
                             </div>
                         </div>
                         <button type="submit" class="w-full bg-emerald-600 dark:bg-emerald-700 text-white py-3 px-4 rounded-lg hover:bg-emerald-700 dark:hover:bg-emerald-600 transition duration-200 font-bold shadow-md hover:shadow-lg flex justify-center items-center">
@@ -367,6 +376,7 @@
                             <thead class="bg-gray-100 dark:bg-gray-700">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Ativo</th>
+                                    <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Instituição</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Valor Inicial</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Taxa</th>
                                     <th class="px-6 py-3 text-left text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Duração</th>
@@ -392,23 +402,51 @@
     </main>
 
     <!-- Modal de Confirmação de Exclusão -->
-    <div id="delete-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50 flex items-center justify-center backdrop-blur-sm">
-        <div class="relative p-5 border w-96 shadow-lg rounded-md bg-white dark:bg-gray-800 dark:border-gray-700">
-            <div class="mt-3 text-center">
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30">
-                    <i data-feather="alert-triangle" class="h-6 w-6 text-red-600 dark:text-red-400"></i>
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md dark:bg-gray-800 border dark:border-gray-700">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 dark:bg-gray-800">
+                    <div class="flex flex-col items-center justify-center text-center">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20 mb-4">
+                             <div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-800/50">
+                                <i data-feather="trash-2" class="h-5 w-5 text-red-600 dark:text-red-400"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold leading-6 text-gray-900 dark:text-white" id="modal-title">Excluir Item</h3>
+                        <div class="mt-2">
+                            <p id="delete-msg" class="text-sm text-gray-500 dark:text-gray-400">Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.</p>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white mt-4">Excluir Item</h3>
-                <div class="mt-2 px-7 py-3">
-                    <p id="delete-msg" class="text-sm text-gray-500 dark:text-gray-400">Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita.</p>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 dark:bg-gray-800/50 flex flex-col sm:flex-row-reverse gap-3 pb-6">
+                    <button id="confirm-delete-btn" type="button" class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 sm:w-1/2 transition-colors">Excluir</button>
+                    <button id="cancel-delete-btn" type="button" class="inline-flex w-full justify-center rounded-lg bg-white px-3 py-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-200 dark:ring-gray-600 dark:hover:bg-gray-600 sm:w-1/2 transition-colors">Cancelar</button>
                 </div>
-                <div class="items-center px-4 py-3 flex space-x-4">
-                    <button id="cancel-delete-btn" class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 text-base font-medium rounded-md w-full shadow-sm hover:bg-gray-300 dark:hover:bg-gray-600 focus:outline-none transition-colors">
-                        Cancelar
-                    </button>
-                    <button id="confirm-delete-btn" class="px-4 py-2 bg-red-600 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-red-700 focus:outline-none transition-colors">
-                        Excluir
-                    </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Sucesso -->
+    <div id="success-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
+        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md dark:bg-gray-800 border dark:border-gray-700">
+                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 dark:bg-gray-800">
+                    <div class="flex flex-col items-center justify-center text-center">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-50 dark:bg-green-900/20 mb-4">
+                             <div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-800/50">
+                                <i data-feather="check" class="h-5 w-5 text-green-600 dark:text-green-400"></i>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-bold leading-6 text-gray-900 dark:text-white" id="success-modal-title">Sucesso!</h3>
+                        <div class="mt-2">
+                            <p id="success-msg" class="text-sm text-gray-500 dark:text-gray-400">Ação realizada com sucesso.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 dark:bg-gray-800/50 flex justify-center pb-6">
+                    <button id="close-success-btn" type="button" class="inline-flex w-full justify-center rounded-lg bg-green-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600 sm:w-1/2 transition-colors">OK</button>
                 </div>
             </div>
         </div>
@@ -429,7 +467,7 @@
         
         let transactionIdToDelete = null; 
         let investmentIdToDelete = null;
-        let deleteType = null; // 'transaction' or 'investment'
+        let deleteType = null; 
         let editingTransactionId = null; 
         
         let categoryChartInstance = null;
@@ -459,6 +497,17 @@
             if(!str) return 0;
             return parseFloat(str.replace(/\./g, '').replace(',', '.'));
         }
+
+        // --- MODAL SUCESSO LOGIC ---
+        function showSuccess(message) {
+            document.getElementById('success-msg').textContent = message;
+            document.getElementById('success-modal').classList.remove('hidden');
+            feather.replace();
+        }
+
+        document.getElementById('close-success-btn').addEventListener('click', () => {
+            document.getElementById('success-modal').classList.add('hidden');
+        });
 
         // --- TABS LOGIC ---
         function switchTab(tabName) {
@@ -509,52 +558,38 @@
         }
 
         // --- INVESTMENTS LOGIC ---
-        
         document.getElementById('investment-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const name = document.getElementById('inv-name').value;
+            const institution = document.getElementById('inv-institution').value;
             const date = document.getElementById('inv-date').value;
             const initial = parseCurrency(document.getElementById('inv-initial').value);
-            const duration = parseFloat(document.getElementById('inv-duration').value); // Em Anos
+            const duration = parseFloat(document.getElementById('inv-duration').value);
             const rate = parseFloat(document.getElementById('inv-rate').value);
             const rateType = document.getElementById('inv-rate-type').value;
 
-            if (!name || !date || isNaN(initial) || isNaN(rate) || isNaN(duration)) {
-                alert("Preencha os campos obrigatórios corretamente.");
-                return;
+            if (!name || !institution || !date || isNaN(initial) || isNaN(rate) || isNaN(duration)) {
+                alert("Preencha os campos obrigatórios corretamente."); return;
             }
 
-            const investment = {
-                id: Date.now(),
-                name, date, initial, duration, rate, rateType
-            };
-
+            const investment = { id: Date.now(), name, institution, date, initial, duration, rate, rateType };
             investments.push(investment);
             localStorage.setItem('investments', JSON.stringify(investments));
-            
             this.reset();
             renderInvestments();
-            alert("Investimento registrado com sucesso!");
+            showSuccess("Investimento registrado com sucesso!");
         });
 
         function calculateInvestmentValue(inv) {
-            // Cálculo de Valor Futuro (Juros Compostos)
-            // FV = PV * (1 + r)^t
-            
             let timeInPeriods = 0;
             let ratePerPeriod = 0;
-
             if (inv.rateType === 'annual') {
-                // Taxa anual, tempo em anos
                 ratePerPeriod = inv.rate / 100;
                 timeInPeriods = inv.duration;
             } else {
-                // Taxa mensal, tempo em meses
                 ratePerPeriod = inv.rate / 100;
                 timeInPeriods = inv.duration * 12;
             }
-
             const finalValue = inv.initial * Math.pow(1 + ratePerPeriod, timeInPeriods);
             return finalValue;
         }
@@ -562,66 +597,70 @@
         function renderInvestments() {
             const list = document.getElementById('investments-list');
             const emptyState = document.getElementById('inv-empty-state');
+            const institutionList = document.getElementById('institution-breakdown');
+            
             list.innerHTML = '';
+            institutionList.innerHTML = '';
 
             let totalBalance = 0;
             let totalInvested = 0;
+            const institutionYields = {};
 
             if (investments.length === 0) {
                 emptyState.classList.remove('hidden');
+                institutionList.innerHTML = '<p class="italic text-gray-400">Nenhum dado registrado ainda</p>';
             } else {
                 emptyState.classList.add('hidden');
                 
                 investments.forEach(inv => {
                     const finalVal = calculateInvestmentValue(inv);
                     const yieldVal = finalVal - inv.initial;
-                    
                     totalBalance += finalVal;
                     totalInvested += inv.initial;
 
+                    const instKey = inv.institution.trim(); 
+                    if (!institutionYields[instKey]) institutionYields[instKey] = 0;
+                    institutionYields[instKey] += yieldVal;
+
                     const row = document.createElement('tr');
                     row.className = 'hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-b dark:border-gray-700 last:border-0';
-                    
                     const rateLabel = inv.rateType === 'annual' ? '% a.a.' : '% a.m.';
 
                     row.innerHTML = `
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">${inv.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${inv.institution}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${formatCurrency(inv.initial)}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${inv.rate}${rateLabel}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">${inv.duration} anos</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600 dark:text-emerald-400">${formatCurrency(finalVal)}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-500 dark:text-green-400">+${formatCurrency(yieldVal)}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                            <button onclick="deleteInvestment(${inv.id})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors" title="Excluir">
-                                <i data-feather="trash-2" class="h-5 w-5"></i>
-                            </button>
+                            <button onclick="deleteInvestment(${inv.id})" class="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 transition-colors" title="Excluir"><i data-feather="trash-2" class="h-5 w-5"></i></button>
                         </td>
                     `;
                     list.appendChild(row);
                 });
+
+                const sortedInstitutions = Object.entries(institutionYields).sort((a, b) => b[1] - a[1]);
+                sortedInstitutions.forEach(([inst, yieldVal]) => {
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between p-2 rounded hover:bg-cyan-50 dark:hover:bg-cyan-900/20 transition-colors border-b border-gray-100 dark:border-gray-700 last:border-0';
+                    div.innerHTML = `<span class="font-medium text-gray-700 dark:text-gray-300">${inst}</span><span class="font-bold text-cyan-600 dark:text-cyan-400">+${formatCurrency(yieldVal)}</span>`;
+                    institutionList.appendChild(div);
+                });
             }
 
-            // Atualizar Resumo
             document.getElementById('inv-total-balance').textContent = formatCurrency(totalBalance);
             document.getElementById('inv-total-invested').textContent = formatCurrency(totalInvested);
             const totalYield = totalBalance - totalInvested;
-            document.getElementById('inv-total-yield').textContent = (totalYield >= 0 ? '+' : '') + formatCurrency(totalYield);
-            
             const yieldEl = document.getElementById('inv-total-yield');
-            if (totalYield >= 0) {
-                yieldEl.classList.remove('text-red-500');
-                yieldEl.classList.add('text-green-500');
-            } else {
-                yieldEl.classList.remove('text-green-500');
-                yieldEl.classList.add('text-red-500');
-            }
-            
+            yieldEl.textContent = (totalYield >= 0 ? '+' : '') + formatCurrency(totalYield);
+            if (totalYield >= 0) { yieldEl.classList.remove('text-red-500'); yieldEl.classList.add('text-green-500'); }
+            else { yieldEl.classList.remove('text-green-500'); yieldEl.classList.add('text-red-500'); }
             feather.replace();
         }
 
-        // --- DASHBOARD & TRANSACTION LOGIC ---
-        
-        // Chart Logic
+        // --- DASHBOARD LOGIC ---
         function renderCharts() {
             const isDark = document.documentElement.classList.contains('dark');
             const textColor = isDark ? '#e5e7eb' : '#374151';
@@ -677,7 +716,6 @@
             });
         }
 
-        // Backup
         function exportData() {
             const allData = { transactions, investments };
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(allData));
@@ -706,7 +744,7 @@
                         saveAndRender();
                         localStorage.setItem('investments', JSON.stringify(investments));
                         renderInvestments();
-                        alert("Dados importados com sucesso!");
+                        showSuccess("Dados importados com sucesso!");
                     }
                 } catch (error) { alert("Erro ao ler o arquivo."); }
                 input.value = '';
@@ -714,7 +752,6 @@
             reader.readAsText(file);
         }
 
-        // Budget
         function editBudget() {
             document.getElementById('budget-edit-container').classList.toggle('hidden');
             document.getElementById('new-budget-input').value = budgetLimit || '';
@@ -759,16 +796,30 @@
             }
         }
 
-        // UI Core
+        // --- UI Core Update: Populate Datalist ---
         function updateCategories() {
             const type = document.getElementById('transaction-type').value;
-            const catSelect = document.getElementById('transaction-category');
-            const currentVal = catSelect.value;
-            catSelect.innerHTML = '';
+            const categoryInput = document.getElementById('transaction-category');
+            const dataList = document.getElementById('category-list');
+            
+            dataList.innerHTML = ''; // Clear options
+            
+            // Add predefined categories
             categories[type].forEach(cat => {
-                const op = document.createElement('option'); op.value = cat; op.textContent = cat; catSelect.appendChild(op);
+                const op = document.createElement('option');
+                op.value = cat;
+                dataList.appendChild(op);
             });
-            if (currentVal && categories[type].includes(currentVal)) catSelect.value = currentVal;
+            
+            // Add custom used categories
+            const usedCats = new Set(transactions.filter(t => t.type === type).map(t => t.category));
+            usedCats.forEach(cat => {
+                if (!categories[type].includes(cat)) {
+                     const op = document.createElement('option');
+                     op.value = cat;
+                     dataList.appendChild(op);
+                }
+            });
         }
 
         // Transactions
@@ -776,8 +827,9 @@
             const t = transactions.find(tx => tx.id === id);
             if (!t) return;
             document.getElementById('transaction-type').value = t.type;
-            updateCategories();
-            document.getElementById('transaction-category').value = t.category;
+            updateCategories(); // Populate datalist
+            document.getElementById('transaction-category').value = t.category; // Set value on input
+            
             let cleanDesc = t.description;
             if (t.recurringGroupId) cleanDesc = t.description.replace(/\s\(\d+\/\d+\)$/, '');
             document.getElementById('transaction-description').value = cleanDesc;
@@ -817,7 +869,7 @@
             const desc = document.getElementById('transaction-description').value;
             const amountStr = document.getElementById('transaction-amount').value;
             const amount = parseFloat(amountStr.replace(/\./g, '').replace(',', '.'));
-            const cat = document.getElementById('transaction-category').value;
+            const cat = document.getElementById('transaction-category').value; // Get value from input
             const dateStr = document.getElementById('transaction-date').value;
             const repeat = parseInt(document.getElementById('transaction-repeat').value);
 
@@ -857,26 +909,31 @@
                 this.reset(); document.getElementById('transaction-date').valueAsDate = new Date(); updateCategories();
             }
             saveAndRender();
+            showSuccess("Transação salva com sucesso!");
         });
 
         // Delete General Logic
         window.deleteInvestment = function(id) {
             investmentIdToDelete = id;
             deleteType = 'investment';
-            document.getElementById('delete-msg').textContent = "Tem certeza que deseja excluir este investimento?";
+            document.getElementById('modal-title').textContent = "Excluir Investimento";
+            document.getElementById('delete-msg').textContent = "Tem certeza que deseja excluir este investimento? Esta ação não pode ser desfeita.";
             document.getElementById('delete-modal').classList.remove('hidden');
+            feather.replace();
         }
 
         window.deleteTransaction = function(id) {
             transactionIdToDelete = id;
             deleteType = 'transaction';
+            document.getElementById('modal-title').textContent = "Excluir Transação";
             const t = transactions.find(tx => tx.id === id);
             if(t && t.recurringGroupId && t.recurrenceIndex === 1) {
-                document.getElementById('delete-msg').innerHTML = `Esta é a principal de uma série.<br>Deseja excluir <b>toda a série</b>?`;
+                document.getElementById('delete-msg').innerHTML = `Esta é a <b>transação principal</b> de uma série recorrente.<br>Deseja excluir <b>toda a série</b> (${t.recurrenceTotal} transações)?`;
             } else {
-                document.getElementById('delete-msg').textContent = "Tem certeza que deseja excluir?";
+                document.getElementById('delete-msg').textContent = "Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.";
             }
             document.getElementById('delete-modal').classList.remove('hidden');
+            feather.replace();
         }
 
         document.getElementById('cancel-delete-btn').addEventListener('click', () => {
