@@ -26,7 +26,7 @@
                     },
                     borderRadius: { 
                         '2xl': '1rem',
-                        '3xl': '1.5rem', // Mais arredondado
+                        '3xl': '1.5rem', 
                     }
                 }
             }
@@ -44,9 +44,9 @@
         .tab-active { border-bottom: 3px solid #2563eb; color: #2563eb; font-weight: 600; }
         .dark .tab-active { border-bottom-color: #60a5fa; color: #60a5fa; }
         
-        /* Calendar Styles Atualizados */
+        /* Calendar Styles */
         .calendar-day { 
-            min-height: 100px; /* Um pouco mais alto para elegância */
+            min-height: 100px; 
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .calendar-day:hover {
@@ -97,12 +97,31 @@
         <div id="view-dashboard" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <!-- COLUNA ESQUERDA -->
             <div class="lg:col-span-1 space-y-6">
-                <!-- Resumo Geral -->
+                <!-- Resumo Geral (ATUALIZADO) -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 border-l-4 border-blue-500 transition-colors">
                     <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white">
                         <i data-feather="pie-chart" class="mr-2 h-5 w-5"></i> Resumo Geral
                     </h2>
                     <div class="space-y-4">
+                        <!-- Campo Saldo Inicial -->
+                        <div class="flex justify-between items-center text-sm bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg border border-blue-100 dark:border-blue-800">
+                            <span class="text-gray-600 dark:text-gray-300 font-medium">Saldo Inicial:</span>
+                            <div class="flex items-center space-x-2">
+                                <span id="display-initial-balance" class="font-bold text-blue-700 dark:text-blue-300">R$ 0,00</span>
+                                <button onclick="editInitialBalance()" class="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 focus:outline-none" title="Editar Saldo Inicial">
+                                    <i data-feather="edit-2" class="w-3 h-3"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Input Oculto para Saldo Inicial -->
+                        <div id="initial-balance-container" class="hidden mt-2">
+                             <div class="flex space-x-2">
+                                <input type="text" id="initial-balance-input" class="w-full px-2 py-1 border rounded text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0,00" oninput="formatCurrencyMask(this)">
+                                <button onclick="saveInitialBalance()" class="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700">OK</button>
+                            </div>
+                        </div>
+
                         <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-xl transition-colors">
                             <p class="text-gray-600 dark:text-gray-300 text-sm uppercase tracking-wide">Saldo Total</p>
                             <p id="current-balance" class="text-3xl font-bold dark:text-white">R$ 0,00</p>
@@ -264,13 +283,13 @@
                     </form>
                 </div>
 
-                <!-- Lista de Transações (COM FILTROS) -->
+                <!-- Lista de Transações -->
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 transition-colors">
+                    <!-- Filtros (Mantidos) -->
                     <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                         <h2 class="text-xl font-bold flex items-center dark:text-white w-full sm:w-auto">
                             <i data-feather="list" class="mr-2 h-5 w-5"></i> Histórico
                         </h2>
-                        <!-- Filtros -->
                         <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                             <div class="relative">
                                 <i data-feather="search" class="absolute left-3 top-2.5 h-4 w-4 text-gray-400"></i>
@@ -295,11 +314,8 @@
                                     <th class="px-6 py-3 text-center text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="transactions-list" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                <!-- Transações preenchidas via JS -->
-                            </tbody>
+                            <tbody id="transactions-list" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700"></tbody>
                         </table>
-                        
                         <div id="empty-state" class="hidden text-center py-8 text-gray-500 dark:text-gray-400">
                             <i data-feather="inbox" class="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600 mb-2"></i>
                             <p>Nenhuma transação encontrada.</p>
@@ -309,37 +325,23 @@
             </div>
         </div>
 
-        <!-- ==================== VIEW: CALENDÁRIO ==================== -->
+        <!-- ==================== OUTRAS VIEWS (Calendário, Metas, Investimentos) MANTIDAS ==================== -->
+        <!-- ... (View Calendário Oculto) ... -->
         <div id="view-calendar" class="hidden">
+            <!-- Conteúdo do Calendário (inalterado) -->
             <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg p-8 transition-colors">
                 <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-2xl font-bold dark:text-white flex items-center">
-                        <i data-feather="calendar" class="mr-3 text-blue-500"></i> Calendário Financeiro
-                    </h2>
+                    <h2 class="text-2xl font-bold dark:text-white flex items-center"><i data-feather="calendar" class="mr-3 text-blue-500"></i> Calendário Financeiro</h2>
                     <div class="flex items-center space-x-4 bg-gray-100 dark:bg-gray-700 rounded-full px-4 py-2 shadow-inner">
-                        <button onclick="changeMonth(-1)" class="p-2 hover:bg-white dark:hover:bg-gray-600 rounded-full transition shadow-sm">
-                            <i data-feather="chevron-left" class="dark:text-white h-5 w-5"></i>
-                        </button>
+                        <button onclick="changeMonth(-1)" class="p-2 hover:bg-white dark:hover:bg-gray-600 rounded-full transition shadow-sm"><i data-feather="chevron-left" class="dark:text-white h-5 w-5"></i></button>
                         <span id="calendar-month-year" class="text-lg font-bold dark:text-white capitalize w-40 text-center tracking-wide">Novembro 2024</span>
-                        <button onclick="changeMonth(1)" class="p-2 hover:bg-white dark:hover:bg-gray-600 rounded-full transition shadow-sm">
-                            <i data-feather="chevron-right" class="dark:text-white h-5 w-5"></i>
-                        </button>
+                        <button onclick="changeMonth(1)" class="p-2 hover:bg-white dark:hover:bg-gray-600 rounded-full transition shadow-sm"><i data-feather="chevron-right" class="dark:text-white h-5 w-5"></i></button>
                     </div>
                 </div>
-                
                 <div class="grid grid-cols-7 gap-4 text-center mb-4">
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Dom</div>
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Seg</div>
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Ter</div>
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Qua</div>
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Qui</div>
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Sex</div>
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider">Sáb</div>
+                    <div class="text-xs font-bold text-gray-400 uppercase">Dom</div><div class="text-xs font-bold text-gray-400 uppercase">Seg</div><div class="text-xs font-bold text-gray-400 uppercase">Ter</div><div class="text-xs font-bold text-gray-400 uppercase">Qua</div><div class="text-xs font-bold text-gray-400 uppercase">Qui</div><div class="text-xs font-bold text-gray-400 uppercase">Sex</div><div class="text-xs font-bold text-gray-400 uppercase">Sáb</div>
                 </div>
-                <div id="calendar-grid" class="grid grid-cols-7 gap-4">
-                    <!-- Dias gerados via JS -->
-                </div>
-                
+                <div id="calendar-grid" class="grid grid-cols-7 gap-4"></div>
                 <div id="day-details" class="hidden mt-8 border-t border-gray-100 dark:border-gray-700 pt-6 animate-fade-in">
                     <h3 id="day-details-title" class="text-lg font-bold dark:text-white mb-4 flex items-center"><i data-feather="activity" class="mr-2 w-4 h-4 text-blue-500"></i> Transações do Dia</h3>
                     <ul id="day-details-list" class="space-y-3"></ul>
@@ -347,10 +349,9 @@
             </div>
         </div>
 
-        <!-- ==================== VIEW: METAS ==================== -->
         <div id="view-goals" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- (Mesmo código de metas) -->
-            <div class="lg:col-span-1">
+             <!-- Conteúdo de Metas (inalterado) -->
+             <div class="lg:col-span-1">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 mb-6 transition-colors border-l-4 border-pink-500">
                     <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white"><i data-feather="target" class="mr-2 h-5 w-5"></i> Nova Meta</h2>
                     <form id="goal-form" class="space-y-4">
@@ -374,9 +375,8 @@
             </div>
         </div>
 
-        <!-- ==================== VIEW: INVESTIMENTOS ==================== -->
         <div id="view-investments" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- (Mesmo código de investimentos) -->
+            <!-- Conteúdo de Investimentos (ATUALIZADO COM NOVO GRÁFICO DE EVOLUÇÃO) -->
             <div class="lg:col-span-1 space-y-6">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 border-l-4 border-emerald-500 transition-colors">
                     <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white"><i data-feather="briefcase" class="mr-2 h-5 w-5"></i> Resumo da Carteira</h2>
@@ -391,14 +391,22 @@
                         </div>
                     </div>
                 </div>
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 border-l-4 border-lime-500 transition-colors">
+                    <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white"><i data-feather="pie-chart" class="mr-2 h-5 w-5"></i> Composição (% Ganha)</h2>
+                    <div class="mb-4 relative h-48 w-full flex justify-center"><canvas id="investmentCompositionChart"></canvas></div>
+                </div>
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 border-l-4 border-cyan-500 transition-colors">
                     <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white"><i data-feather="briefcase" class="mr-2 h-5 w-5"></i> Rendimento Instituição</h2>
                     <div id="institution-breakdown" class="text-gray-700 dark:text-gray-300 category-list max-h-64 overflow-y-auto pr-2 space-y-2"><p>Nenhum dado.</p></div>
                 </div>
             </div>
             <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 border-l-4 border-purple-500 transition-colors">
+                    <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white"><i data-feather="trending-up" class="mr-2 h-5 w-5"></i> Projeção de Evolução</h2>
+                    <div class="relative w-full h-64"><canvas id="investmentEvolutionChart"></canvas></div>
+                </div>
                 <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6 transition-colors">
-                    <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white"><i data-feather="trending-up" class="mr-2 h-5 w-5"></i> Novo Investimento</h2>
+                    <h2 class="text-xl font-bold mb-4 flex items-center dark:text-white"><i data-feather="plus-circle" class="mr-2 h-5 w-5"></i> Novo Investimento</h2>
                     <form id="investment-form" class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div><label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Nome</label><input type="text" id="inv-name" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></div>
@@ -407,7 +415,18 @@
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div><label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Data</label><input type="date" id="inv-date" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></div>
                             <div><label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Valor</label><input type="text" id="inv-initial" required class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" oninput="formatCurrencyMask(this)"></div>
-                            <div><label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Duração</label><input type="number" id="inv-duration" required step="0.5" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"></div>
+                            
+                            <!-- MODIFICADO: Input Duração com Seletor -->
+                            <div>
+                                <label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Duração</label>
+                                <div class="flex">
+                                    <input type="number" id="inv-duration" required min="1" step="0.5" class="w-2/3 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Ex: 12">
+                                    <select id="inv-duration-type" class="w-1/3 px-2 py-2 border border-l-0 rounded-r-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-600 dark:text-white text-sm focus:outline-none">
+                                        <option value="months">Meses</option>
+                                        <option value="years">Anos</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div><label class="block text-gray-700 dark:text-gray-300 mb-2 font-medium">Taxa (%)</label><div class="flex"><input type="number" id="inv-rate" required step="0.01" class="w-2/3 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"><select id="inv-rate-type" class="w-1/3 px-2 py-2 border border-l-0 rounded-r-lg bg-gray-50 dark:bg-gray-600 dark:border-gray-600 dark:text-white text-sm focus:outline-none"><option value="annual">Anual</option><option value="monthly">Mensal</option></select></div></div>
                         <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition shadow-md">Registrar</button>
@@ -422,59 +441,10 @@
 
     </main>
 
-    <!-- MODAIS -->
-    <div id="delete-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md dark:bg-gray-800 border dark:border-gray-700">
-                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 dark:bg-gray-800">
-                    <div class="flex flex-col items-center justify-center text-center">
-                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20 mb-4"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-800/50"><i data-feather="trash-2" class="h-5 w-5 text-red-600 dark:text-red-400"></i></div></div>
-                        <h3 class="text-xl font-bold leading-6 text-gray-900 dark:text-white" id="modal-title">Excluir Item</h3>
-                        <div class="mt-2"><p id="delete-msg" class="text-sm text-gray-500 dark:text-gray-400">Confirma?</p></div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 dark:bg-gray-800/50 flex flex-col sm:flex-row-reverse gap-3 pb-6">
-                    <button id="confirm-delete-btn" class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-1/2 transition-colors">Excluir</button>
-                    <button id="cancel-delete-btn" class="inline-flex w-full justify-center rounded-lg bg-white px-3 py-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-200 dark:ring-gray-600 sm:w-1/2 transition-colors">Cancelar</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="success-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md dark:bg-gray-800 border dark:border-gray-700">
-                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 dark:bg-gray-800">
-                    <div class="flex flex-col items-center justify-center text-center">
-                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-50 dark:bg-green-900/20 mb-4"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-800/50"><i data-feather="check" class="h-5 w-5 text-green-600 dark:text-green-400"></i></div></div>
-                        <h3 class="text-xl font-bold leading-6 text-gray-900 dark:text-white">Sucesso!</h3>
-                        <div class="mt-2"><p id="success-msg" class="text-sm text-gray-500 dark:text-gray-400">Feito.</p></div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 dark:bg-gray-800/50 flex justify-center pb-6">
-                    <button id="close-success-btn" class="inline-flex w-full justify-center rounded-lg bg-green-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-700 sm:w-1/2 transition-colors">OK</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="goal-modal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div>
-        <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md dark:bg-gray-800 border dark:border-gray-700">
-                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 dark:bg-gray-800">
-                    <h3 class="text-lg font-bold leading-6 text-gray-900 dark:text-white mb-4" id="goal-modal-title">Adicionar</h3>
-                    <input type="text" id="goal-action-amount" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4" placeholder="R$ 0,00" oninput="formatCurrencyMask(this)">
-                    <div class="flex space-x-3">
-                        <button id="goal-confirm-btn" class="flex-1 bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 font-bold">Confirmar</button>
-                        <button onclick="closeGoalModal()" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">Cancelar</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- MODAIS (Mantidos) -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden overflow-y-auto"><div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div><div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0"><div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md dark:bg-gray-800 border dark:border-gray-700"><div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 dark:bg-gray-800"><div class="flex flex-col items-center justify-center text-center"><div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20 mb-4"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-800/50"><i data-feather="trash-2" class="h-5 w-5 text-red-600 dark:text-red-400"></i></div></div><h3 class="text-xl font-bold leading-6 text-gray-900 dark:text-white" id="modal-title">Excluir Item</h3><div class="mt-2"><p id="delete-msg" class="text-sm text-gray-500 dark:text-gray-400">Confirma?</p></div></div></div><div class="bg-gray-50 px-4 py-3 sm:px-6 dark:bg-gray-800/50 flex flex-col sm:flex-row-reverse gap-3 pb-6"><button id="confirm-delete-btn" class="inline-flex w-full justify-center rounded-lg bg-red-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-red-700 sm:w-1/2 transition-colors">Excluir</button><button id="cancel-delete-btn" class="inline-flex w-full justify-center rounded-lg bg-white px-3 py-3 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-200 dark:ring-gray-600 sm:w-1/2 transition-colors">Cancelar</button></div></div></div></div>
+    <div id="success-modal" class="fixed inset-0 z-50 hidden overflow-y-auto"><div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div><div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0"><div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md dark:bg-gray-800 border dark:border-gray-700"><div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4 dark:bg-gray-800"><div class="flex flex-col items-center justify-center text-center"><div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-50 dark:bg-green-900/20 mb-4"><div class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-800/50"><i data-feather="check" class="h-5 w-5 text-green-600 dark:text-green-400"></i></div></div><h3 class="text-xl font-bold leading-6 text-gray-900 dark:text-white">Sucesso!</h3><div class="mt-2"><p id="success-msg" class="text-sm text-gray-500 dark:text-gray-400">Feito.</p></div></div></div><div class="bg-gray-50 px-4 py-3 sm:px-6 dark:bg-gray-800/50 flex justify-center pb-6"><button id="close-success-btn" class="inline-flex w-full justify-center rounded-lg bg-green-600 px-3 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-700 sm:w-1/2 transition-colors">OK</button></div></div></div></div>
+    <div id="goal-modal" class="fixed inset-0 z-50 hidden overflow-y-auto"><div class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm transition-opacity"></div><div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0"><div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md dark:bg-gray-800 border dark:border-gray-700"><div class="bg-white px-4 pb-4 pt-5 sm:p-6 dark:bg-gray-800"><h3 class="text-lg font-bold leading-6 text-gray-900 dark:text-white mb-4" id="goal-modal-title">Adicionar</h3><input type="text" id="goal-action-amount" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white mb-4" placeholder="R$ 0,00" oninput="formatCurrencyMask(this)"><div class="flex space-x-3"><button id="goal-confirm-btn" class="flex-1 bg-pink-600 text-white py-2 rounded-lg hover:bg-pink-700 font-bold">Confirmar</button><button onclick="closeGoalModal()" class="flex-1 bg-gray-200 text-gray-800 py-2 rounded-lg hover:bg-gray-300 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">Cancelar</button></div></div></div></div></div>
 
     <footer class="bg-gray-800 dark:bg-black text-gray-300 py-6 mt-auto transition-colors">
         <div class="container mx-auto px-4 text-center"><p>&copy; 2024 MoneyMinder. Todos os direitos reservados.</p></div>
@@ -486,6 +456,7 @@
         let investments = JSON.parse(localStorage.getItem('investments')) || [];
         let goals = JSON.parse(localStorage.getItem('goals')) || [];
         let budgetLimit = parseFloat(localStorage.getItem('budgetLimit')) || 0;
+        let initialBalance = parseFloat(localStorage.getItem('initialBalance')) || 0; 
         
         let transactionIdToDelete = null; 
         let investmentIdToDelete = null;
@@ -496,6 +467,8 @@
         let currentCalendarDate = new Date();
         let categoryChartInstance = null;
         let historyChartInstance = null;
+        let invEvolutionChartInstance = null;
+        let invCompositionChartInstance = null;
         
         const categories = {
             income: ["Salário", "Freelance", "Investimentos", "Reembolso", "Outros"],
@@ -519,7 +492,7 @@
             if(tab === 'dashboard') renderCharts();
             if(tab === 'calendar') renderCalendar();
             if(tab === 'goals') renderGoals();
-            if(tab === 'investments') renderInvestments();
+            if(tab === 'investments') renderInvestmentCharts();
         }
 
         function showSuccess(msg) { document.getElementById('success-msg').textContent=msg; document.getElementById('success-modal').classList.remove('hidden'); }
@@ -534,6 +507,7 @@
             localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
             feather.replace();
             if(!document.getElementById('view-dashboard').classList.contains('hidden')) renderCharts();
+            if(!document.getElementById('view-investments').classList.contains('hidden')) renderInvestmentCharts();
         }
 
         // Calendar
@@ -552,8 +526,6 @@
                 div.className = "calendar-day bg-white dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 p-2 relative cursor-pointer hover:shadow-lg hover:border-blue-200 dark:hover:border-blue-500 transition-all duration-300 flex flex-col justify-between";
                 div.onclick = () => showDayDetails(day, month, year);
                 const dateNum = document.createElement('div'); 
-                
-                // Highlight current day
                 const today = new Date();
                 if(day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
                     dateNum.className = "text-xs font-bold text-white bg-blue-500 rounded-full w-6 h-6 flex items-center justify-center";
@@ -562,23 +534,15 @@
                 }
                 dateNum.textContent = day;
                 div.appendChild(dateNum);
-
                 const dayTrans = transactions.filter(t => { const d = new Date(t.date + 'T00:00:00'); return d.getDate() === day && d.getMonth() === month && d.getFullYear() === year; });
                 if (dayTrans.length > 0) {
                     const inc = dayTrans.filter(t => t.type === 'income').reduce((a,b)=>a+b.amount,0);
                     const exp = dayTrans.filter(t => t.type === 'expense').reduce((a,b)=>a+b.amount,0);
-                    
-                    const indicators = document.createElement('div'); 
-                    indicators.className = "flex justify-end space-x-1 mb-1";
-                    
+                    const indicators = document.createElement('div'); indicators.className = "flex justify-end space-x-1 mb-1";
                     if (inc > 0) indicators.innerHTML += `<span class="block w-2 h-2 rounded-full bg-green-500"></span>`;
                     if (exp > 0) indicators.innerHTML += `<span class="block w-2 h-2 rounded-full bg-red-500"></span>`;
-                    
                     div.appendChild(indicators);
-                    
-                    const net = inc - exp; 
-                    const netDiv = document.createElement('div'); 
-                    netDiv.className = `text-[10px] text-right font-bold ${net >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`;
+                    const net = inc - exp; const netDiv = document.createElement('div'); netDiv.className = `text-[10px] text-right font-bold ${net >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`;
                     if(inc !== 0 || exp !== 0) netDiv.textContent = (net >= 0 ? '+' : '-') + formatCurrency(Math.abs(net));
                     div.appendChild(netDiv);
                 }
@@ -653,7 +617,23 @@
             }
         }
 
-        // Budget/Budget Display
+        // Initial Balance & Budget
+        function editInitialBalance() { document.getElementById('initial-balance-container').classList.toggle('hidden'); document.getElementById('initial-balance-input').value = initialBalance.toLocaleString("pt-BR", {minimumFractionDigits:2}); document.getElementById('initial-balance-input').focus(); }
+        function saveInitialBalance() {
+            initialBalance = parseCurrency(document.getElementById('initial-balance-input').value);
+            localStorage.setItem('initialBalance', initialBalance);
+            saveAndRender();
+            document.getElementById('initial-balance-container').classList.add('hidden');
+        }
+        
+        function editBudget() { document.getElementById('budget-edit-container').classList.toggle('hidden'); document.getElementById('new-budget-input').value = budgetLimit.toLocaleString("pt-BR", {minimumFractionDigits:2}); }
+        function saveBudget() { 
+            budgetLimit = parseCurrency(document.getElementById('new-budget-input').value);
+            localStorage.setItem('budgetLimit', budgetLimit);
+            saveAndRender();
+            document.getElementById('budget-edit-container').classList.add('hidden');
+        }
+
         function updateBudgetDisplay() {
             const now = new Date();
             const currentMonth = now.getMonth(); const currentYear = now.getFullYear();
@@ -662,26 +642,31 @@
             const mTrans = transactions.filter(t => { const d=new Date(t.date+'T00:00:00'); return d.getMonth()===currentMonth && d.getFullYear()===currentYear; });
             const mInc = mTrans.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0);
             const mExp = mTrans.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
-            
-            // New: Remaining calculation
-            const mRemaining = mInc - mExp;
-            
+            const mRemaining = initialBalance + mInc - mExp;
             document.getElementById('budget-income').textContent = formatCurrency(mInc);
             document.getElementById('budget-spent').textContent = formatCurrency(mExp);
             document.getElementById('budget-limit').textContent = formatCurrency(budgetLimit);
-            
-            // Update Remaining Element
             const remEl = document.getElementById('budget-remaining');
             remEl.textContent = formatCurrency(mRemaining);
             remEl.className = `font-bold ${mRemaining >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`;
-
             const pct = budgetLimit > 0 ? Math.min(100, (mExp/budgetLimit)*100) : 0;
             const bar = document.getElementById('budget-bar');
             bar.style.width = `${pct}%`;
             bar.className = `h-4 rounded-full transition-all duration-500 ${pct<50?'bg-teal-500':pct<80?'bg-yellow-500':'bg-red-500'}`;
         }
+        
+        function updateSummary() {
+            document.getElementById('display-initial-balance').textContent = formatCurrency(initialBalance);
+            const inc = transactions.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0);
+            const exp = transactions.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
+            document.getElementById('total-income').textContent = formatCurrency(inc);
+            document.getElementById('total-expenses').textContent = formatCurrency(exp);
+            const total = initialBalance + inc - exp;
+            document.getElementById('current-balance').textContent = formatCurrency(total);
+            updateBudgetDisplay();
+        }
 
-        // Charts, Investments, Transactions (kept same logic)
+        // Charts
         function renderCharts() {
             const ctxCat = document.getElementById('categoryChart').getContext('2d');
             if (categoryChartInstance) categoryChartInstance.destroy();
@@ -719,23 +704,163 @@
             });
         }
 
+        // Investment Charts (UPDATED)
+        function calculateInvestmentValue(inv) {
+            let rate = inv.rate / 100;
+            let time = 0;
+            // Normaliza o tempo para o período da taxa
+            if (inv.rateType === 'annual') {
+                // Se taxa anual, tempo deve ser em ANOS
+                if (inv.durationType === 'years') { time = inv.duration; }
+                else { time = inv.duration / 12; }
+            } else {
+                // Se taxa mensal, tempo deve ser em MESES
+                if (inv.durationType === 'years') { time = inv.duration * 12; }
+                else { time = inv.duration; }
+            }
+            return inv.initial * Math.pow(1 + rate, time);
+        }
+
+        function renderInvestmentCharts() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#e5e7eb' : '#374151';
+            const gridColor = isDark ? '#374151' : '#e5e7eb';
+
+            // Composition Chart
+            const ctxComp = document.getElementById('investmentCompositionChart').getContext('2d');
+            if (invCompositionChartInstance) invCompositionChartInstance.destroy();
+            
+            let totalInvested = 0; let totalYield = 0;
+            if (investments.length > 0) {
+                investments.forEach(inv => {
+                    const fv = calculateInvestmentValue(inv);
+                    totalInvested += inv.initial;
+                    totalYield += (fv - inv.initial);
+                });
+                const pctYield = ((totalYield / (totalInvested + totalYield)) * 100).toFixed(1);
+                const pctInv = (100 - pctYield).toFixed(1);
+                invCompositionChartInstance = new Chart(ctxComp, { type: 'doughnut', data: { labels: [`Principal (${pctInv}%)`, `Rendimento (${pctYield}%)`], datasets: [{ data: [totalInvested, totalYield], backgroundColor: ['#10b981', '#84cc16'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: textColor } } } } });
+            } else {
+                invCompositionChartInstance = new Chart(ctxComp, { type: 'doughnut', data: { labels: ['Vazio'], datasets: [{ data: [1], backgroundColor: ['#d1d5db'], borderWidth: 0 }] }, options: { plugins: { legend: {display: false}, tooltip: {enabled: false} } } });
+            }
+
+            // Evolution Chart - UPDATED TO USE MONTHS ON X-AXIS
+            const ctxEvo = document.getElementById('investmentEvolutionChart').getContext('2d');
+            if (invEvolutionChartInstance) invEvolutionChartInstance.destroy();
+
+            if (investments.length > 0) {
+                // Helper: Get duration in months for standardized x-axis
+                const getDurationInMonths = (i) => i.durationType === 'years' ? i.duration * 12 : i.duration;
+                const maxDurationMonths = Math.ceil(Math.max(...investments.map(getDurationInMonths)));
+                
+                const labels = [];
+                for (let m = 0; m <= maxDurationMonths; m++) {
+                    labels.push(`Mês ${m}`);
+                }
+
+                const datasets = [];
+                
+                // Color palette for distinct lines
+                const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16', '#f97316', '#6366f1'];
+
+                // Create dataset for each investment
+                investments.forEach((inv, index) => {
+                    const dataPoints = [];
+                    const durationMonths = getDurationInMonths(inv);
+                    
+                    // Calculate equivalent monthly rate for progression
+                    let monthlyRate = 0;
+                    if (inv.rateType === 'annual') {
+                        monthlyRate = Math.pow(1 + (inv.rate / 100), 1/12) - 1;
+                    } else {
+                        monthlyRate = inv.rate / 100;
+                    }
+
+                    for (let m = 0; m <= maxDurationMonths; m++) {
+                        // Cap growth calculation at investment maturity
+                        const activeMonths = Math.min(m, durationMonths);
+                        const val = inv.initial * Math.pow(1 + monthlyRate, activeMonths);
+                        dataPoints.push(val);
+                    }
+
+                    const color = colors[index % colors.length];
+                    datasets.push({
+                        label: inv.name,
+                        data: dataPoints,
+                        borderColor: color,
+                        backgroundColor: color + '20',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2
+                    });
+                });
+
+                // Optional: Add Total Line
+                const totalDataPoints = [];
+                for (let m = 0; m <= maxDurationMonths; m++) {
+                    let sum = 0;
+                    datasets.forEach(ds => sum += ds.data[m]);
+                    totalDataPoints.push(sum);
+                }
+                
+                datasets.unshift({
+                    label: 'Total Carteira',
+                    data: totalDataPoints,
+                    borderColor: isDark ? '#e5e7eb' : '#1f2937',
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0
+                });
+
+                invEvolutionChartInstance = new Chart(ctxEvo, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: { 
+                                ticks: { color: textColor, maxTicksLimit: 12 },
+                                grid: { display: false } 
+                            },
+                            y: { 
+                                ticks: { color: textColor }, 
+                                grid: { color: gridColor } 
+                            }
+                        },
+                        plugins: { 
+                            legend: { labels: { color: textColor, usePointStyle: true }, position: 'top' },
+                            tooltip: { mode: 'index', intersect: false, callbacks: { label: function(c) { return c.dataset.label + ': ' + formatCurrency(c.raw); } } }
+                        },
+                        interaction: { mode: 'nearest', axis: 'x', intersect: false }
+                    }
+                });
+            }
+        }
+
         function renderInvestments() {
             const list = document.getElementById('investments-list'); list.innerHTML="";
             if(investments.length===0) { document.getElementById('inv-empty-state').classList.remove('hidden'); return; }
             document.getElementById('inv-empty-state').classList.add('hidden');
             let totalInv = 0, totalBal = 0; const instYield = {};
             investments.forEach(inv => {
-                let periods = inv.rateType === 'annual' ? inv.duration : inv.duration*12;
-                let rate = inv.rate / 100;
-                let fv = inv.initial * Math.pow(1+rate, periods);
-                let yld = fv - inv.initial;
+                const finalVal = calculateInvestmentValue(inv);
+                const yld = finalVal - inv.initial;
                 const rateLabel = inv.rateType === 'annual' ? '% a.a.' : '% a.m.';
-                totalInv += inv.initial; totalBal += fv;
+                const durationLabel = inv.durationType === 'years' ? (inv.duration === 1 ? 'ano' : 'anos') : (inv.duration === 1 ? 'mês' : 'meses');
+                
+                totalInv += inv.initial; totalBal += finalVal;
                 const instKey = inv.institution.trim(); 
                 if (!instYield[instKey]) instYield[instKey] = 0; instYield[instKey] += yld;
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-gray-50 dark:hover:bg-gray-700 border-b dark:border-gray-700";
-                tr.innerHTML = `<td class="px-6 py-4 text-sm dark:text-white font-medium">${inv.name}</td><td class="px-6 py-4 text-sm dark:text-gray-300">${inv.institution}</td><td class="px-6 py-4 text-sm dark:text-gray-300">${formatCurrency(inv.initial)}</td><td class="px-6 py-4 text-sm dark:text-gray-300">${inv.rate}${rateLabel}</td><td class="px-6 py-4 text-sm dark:text-gray-300">${inv.duration} anos</td><td class="px-6 py-4 text-sm font-bold text-emerald-600 dark:text-emerald-400">${formatCurrency(fv)}</td><td class="px-6 py-4 text-sm font-bold text-green-500 dark:text-green-400">+${formatCurrency(yld)}</td><td class="px-6 py-4 text-center"><button onclick="deleteInvestment(${inv.id})" class="text-red-500 hover:text-red-700"><i data-feather="trash-2" class="w-4 h-4"></i></button></td>`;
+                tr.innerHTML = `<td class="px-6 py-4 text-sm dark:text-white font-medium">${inv.name}</td><td class="px-6 py-4 text-sm dark:text-gray-300">${inv.institution}</td><td class="px-6 py-4 text-sm dark:text-gray-300">${formatCurrency(inv.initial)}</td><td class="px-6 py-4 text-sm dark:text-gray-300">${inv.rate}${rateLabel}</td><td class="px-6 py-4 text-sm dark:text-gray-300">${inv.duration} ${durationLabel}</td><td class="px-6 py-4 text-sm font-bold text-emerald-600 dark:text-emerald-400">${formatCurrency(finalVal)}</td><td class="px-6 py-4 text-sm font-bold text-green-500 dark:text-green-400">+${formatCurrency(yld)}</td><td class="px-6 py-4 text-center"><button onclick="deleteInvestment(${inv.id})" class="text-red-500 hover:text-red-700"><i data-feather="trash-2" class="w-4 h-4"></i></button></td>`;
                 list.appendChild(tr);
             });
             document.getElementById('inv-total-balance').textContent = formatCurrency(totalBal);
@@ -746,6 +871,7 @@
                 instList.innerHTML += `<div class="flex justify-between p-2 border-b dark:border-gray-700 text-sm"><span class="dark:text-gray-300">${k}</span><span class="text-cyan-600 font-bold">+${formatCurrency(v)}</span></div>`;
             });
             feather.replace();
+            renderInvestmentCharts();
         }
 
         // Transaction Form
@@ -784,39 +910,27 @@
         }
 
         function renderDashboard() {
-            const inc = transactions.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0);
-            const exp = transactions.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
-            document.getElementById('total-income').textContent = formatCurrency(inc);
-            document.getElementById('total-expenses').textContent = formatCurrency(exp);
-            document.getElementById('current-balance').textContent = formatCurrency(inc-exp);
-            
-            // Call renderTransactionList which handles filtering now
+            // Call updated summary
+            updateSummary();
             renderTransactionList();
-            
             const catList = document.getElementById('category-breakdown'); catList.innerHTML="";
             const cats = {}; transactions.filter(t=>t.type==='expense').forEach(t => cats[t.category]=(cats[t.category]||0)+t.amount);
             Object.entries(cats).sort((a,b)=>b[1]-a[1]).forEach(([k,v]) => {
                 catList.innerHTML+=`<div class="flex justify-between text-sm p-2 border-b dark:border-gray-700"><span class="dark:text-gray-300">${k}</span><span class="font-bold text-orange-500">${formatCurrency(v)}</span></div>`;
             });
-            updateBudgetDisplay();
             renderCharts();
             feather.replace();
         }
 
-        // NEW FUNCTION FOR FILTERED LIST
         function renderTransactionList() {
             const searchText = document.getElementById('filter-search').value.toLowerCase();
             const filterType = document.getElementById('filter-type').value;
-            
-            const list = document.getElementById('transactions-list'); 
-            list.innerHTML = "";
-            
+            const list = document.getElementById('transactions-list'); list.innerHTML = "";
             const filtered = transactions.filter(t => {
                 const matchesText = t.description.toLowerCase().includes(searchText) || t.category.toLowerCase().includes(searchText);
                 const matchesType = filterType === 'all' || t.type === filterType;
                 return matchesText && matchesType;
             }).sort((a,b)=>new Date(b.date)-new Date(a.date));
-
             if(filtered.length===0) document.getElementById('empty-state').classList.remove('hidden');
             else {
                 document.getElementById('empty-state').classList.add('hidden');
@@ -827,7 +941,6 @@
                     tr.innerHTML = `<td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">${new Date(t.date+'T00:00:00').toLocaleDateString('pt-BR')}</td><td class="px-6 py-4 text-sm font-medium dark:text-white">${t.description}</td><td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><span class="px-2 py-1 rounded-full text-xs font-bold ${t.type==='income'?'bg-green-100 text-green-800':'bg-red-100 text-red-800'}">${t.category}</span></td><td class="px-6 py-4 text-sm font-bold ${t.type==='income'?'text-green-600':'text-red-600'}">${t.type==='income'?'+':'-'} ${formatCurrency(t.amount)}</td><td class="px-6 py-4 text-center space-x-2"><button onclick="editTransaction(${t.id})" class="text-blue-500"><i data-feather="edit-2" class="w-4 h-4"></i></button><button onclick="deleteTransaction(${t.id})" class="text-red-500"><i data-feather="trash-2" class="w-4 h-4"></i></button></td>`;
                     list.appendChild(tr);
                 });
-                feather.replace();
             }
         }
 
@@ -874,8 +987,21 @@
             const duration = parseFloat(document.getElementById('inv-duration').value);
             const rate = parseFloat(document.getElementById('inv-rate').value);
             const rateType = document.getElementById('inv-rate-type').value;
+            const durationType = document.getElementById('inv-duration-type').value; // Capture duration type
+
             if (!name || !institution || !date || isNaN(initial) || isNaN(rate) || isNaN(duration)) { alert("Erro"); return; }
-            const investment = { id: Date.now(), name, institution, date, initial, duration, rate, rateType };
+            
+            const investment = { 
+                id: Date.now(), 
+                name, 
+                institution, 
+                date, 
+                initial, 
+                duration, 
+                rate, 
+                rateType,
+                durationType // Save duration type
+            };
             investments.push(investment); localStorage.setItem('investments', JSON.stringify(investments));
             this.reset(); renderInvestments(); showSuccess("Investimento salvo!");
         });
@@ -900,13 +1026,7 @@
             };
             reader.readAsText(input.files[0]);
         }
-        function editBudget() { document.getElementById('budget-edit-container').classList.toggle('hidden'); }
-        function saveBudget() { 
-            budgetLimit = parseCurrency(document.getElementById('new-budget-input').value);
-            localStorage.setItem('budgetLimit', budgetLimit);
-            saveAndRender();
-            document.getElementById('budget-edit-container').classList.add('hidden');
-        }
+        
         document.addEventListener('DOMContentLoaded', () => {
             initTheme(); document.getElementById('transaction-date').valueAsDate = new Date();
             updateCategories(); saveAndRender(); renderGoals(); renderInvestments();
